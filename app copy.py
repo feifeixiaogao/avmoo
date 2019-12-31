@@ -1,4 +1,7 @@
 # coding: utf-8
+
+import os
+
 from flask import Flask
 from flask import redirect
 from flask import url_for
@@ -11,15 +14,10 @@ from flask import render_template
 from werkzeug import Request
 import leancloud
 
-import sqlite3
-import requests
-import json
-# from lxml import etree
-import time
-import re
-import math
-import os
-import binascii
+# from views.todos import todos_view
+# from views.users import users_view
+# from views.movies import movies_view
+
 
 app = Flask(__name__)
 app.config.update(dict(PREFERRED_URL_SCHEME='https'))
@@ -56,6 +54,35 @@ class HTTPMethodOverrideMiddleware(object):
 app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
 app.wsgi_app = leancloud.HttpsRedirectMiddleware(app.wsgi_app)
 app.wsgi_app = leancloud.engine.CookieSessionMiddleware(app.wsgi_app, app.secret_key)
+
+# # 动态路由
+# app.register_blueprint(todos_view, url_prefix='/todos')
+# app.register_blueprint(users_view, url_prefix='/users')
+# app.register_blueprint(movies_view, url_prefix='/movies')
+
+
+# @app.before_request
+# def before_request():
+#     g.user = leancloud.User.get_current()
+
+
+# @app.route('/')
+# def index():
+#     return redirect(url_for('movies.show'))
+
+
+# @app.route('/help')
+# def help():
+#     return render_template('help.html')
+
+
+# @app.route('/robots.txt')
+# @app.route('/favicon.svg')
+# @app.route('/favicon.ico')
+# def static_from_root():
+#     return send_from_directory(app.static_folder, request.path[1:])
+
+
 
 #每页展示的数量
 PAGE_LIMIT = 30
@@ -271,6 +298,39 @@ def like_stars():
     result = querySql(sqltext)
     return render_template('stars.html', data=result, cdn=CDN_SITE, keyword='收藏明星')
 
+#暂时没用
+# @app.route('/api/GetMagnet/<keyword>')
+# def get_magnet(keyword=''):
+    s = requests.Session()
+    s.headers = {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+    }
+    result = []
+    if keyword == '':
+        return '{}'
+    url = 'https://btso.pw/search/{}'.format(keyword)
+    main_html = s.get(url).text
+    print(url)
+    return main_html
+    main_tree = etree.HTML(main_html)
+    alist = main_tree.xpath('/html/body/div[2]/div[4]/div[2]/a')
+
+    for item in alist:
+        url = 'https:'+item.attrib.get('href')
+        item_html = s.get(url).text
+        print(url)
+        item_tree = etree.HTML(item_html)
+
+        magnet = re.findall('[A-Z0-9]+$', item.attrib.get('href'))[0]
+
+        print(magnet, item.attrib.get('href'))
+        result.append([
+            item.attrib.get('href'),
+            magnet,
+        ])
+    return json.dumps(result)
+
+
 def pagination(pagenum, count):
     pagecount = math.ceil(count / PAGE_LIMIT)
     if pagecount <= 15:
@@ -366,6 +426,6 @@ def showColumnname(data, description):
 
     return result
 
-if __name__ == '__main__':
-    DB = conn()
-    # app.run(port = 5000)
+# if __name__ == '__main__':
+#     DB = conn()
+#     app.run(port = 5000)
