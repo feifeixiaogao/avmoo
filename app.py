@@ -20,7 +20,7 @@ import re
 import math
 import os
 import binascii
-
+DB = conn()
 app = Flask(__name__)
 app.config.update(dict(PREFERRED_URL_SCHEME='https'))
 try:
@@ -366,6 +366,6 @@ def showColumnname(data, description):
 
     return result
 
-if __name__ == '__main__':
-    DB = conn()
+# if __name__ == '__main__':
+#     DB = conn()
     # app.run(port = 5000)
