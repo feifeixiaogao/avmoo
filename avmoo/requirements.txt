@@ -1,7 +1,7 @@
 appdirs==1.4.3
 arrow==0.10.0
 click==6.7
-Flask==0.12.1
+Flask==1.0
 gevent==1.2.1
 greenlet==0.4.12
 iso8601==0.1.11
