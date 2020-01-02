@@ -98,12 +98,13 @@ CDN_SITE = '//pics.dmm.co.jp'
 #缓存
 SQL_CACHE = {}
 IF_USE_CACHE = True
-DB = conn()
+DB = {}
 @app.route('/')
 @app.route('/page/<int:pagenum>')
 @app.route('/search/<keyword>')
 @app.route('/search/<keyword>/page/<int:pagenum>')
 def index(keyword = '', pagenum = 1):
+    DB = conn()
     if pagenum < 1:
         redirect(url_for('/'))
     limit_start = (pagenum -1) * PAGE_LIMIT
