@@ -98,6 +98,7 @@ CDN_SITE = '//pics.dmm.co.jp'
 #缓存
 SQL_CACHE = {}
 IF_USE_CACHE = True
+DB = conn()
 @app.route('/')
 @app.route('/page/<int:pagenum>')
 @app.route('/search/<keyword>')
@@ -264,4 +265,3 @@ def showColumnname(data, description):
 
     return result
 
-DB = conn()
