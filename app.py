@@ -20,7 +20,7 @@ import re
 import math
 import os
 import binascii
-DB = conn()
+# DB = conn()
 app = Flask(__name__)
 app.config.update(dict(PREFERRED_URL_SCHEME='https'))
 try:
