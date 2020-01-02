@@ -57,6 +57,9 @@ app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
 app.wsgi_app = leancloud.HttpsRedirectMiddleware(app.wsgi_app)
 app.wsgi_app = leancloud.engine.CookieSessionMiddleware(app.wsgi_app, app.secret_key)
 
+@app.route('/')
+def index():
+    return '<h1>Hello, web!</h1>'
 #每页展示的数量
 PAGE_LIMIT = 30
 CDN_SITE = '//jp.netcdn.space'
@@ -64,75 +67,75 @@ CDN_SITE = '//pics.dmm.co.jp'
 #缓存
 SQL_CACHE = {}
 IF_USE_CACHE = True
-@app.route('/')
-@app.route('/page/<int:pagenum>')
-@app.route('/search/<keyword>')
-@app.route('/search/<keyword>/page/<int:pagenum>')
-def index(keyword = '', pagenum = 1):
-    if pagenum < 1:
-        redirect(url_for('/'))
-    limit_start = (pagenum -1) * PAGE_LIMIT
-    keyword = keyword.replace("'",'').replace('"','').strip()
+# @app.route('/')
+# @app.route('/page/<int:pagenum>')
+# @app.route('/search/<keyword>')
+# @app.route('/search/<keyword>/page/<int:pagenum>')
+# def index(keyword = '', pagenum = 1):
+#     if pagenum < 1:
+#         redirect(url_for('/'))
+#     limit_start = (pagenum -1) * PAGE_LIMIT
+#     keyword = keyword.replace("'",'').replace('"','').strip()
 
-    #识别番号
-    if re.match('^[a-zA-Z0-9 \-]{4,14}$', keyword):
-        tmp = keyword.replace(' ', '-').upper()
-        if '-' in tmp:
-            return movie(tmp)
-        else:
-            where = 'av_list.av_id like "%{}%"'.format(tmp)
-    #搜索
-    elif keyword != '':
-        where = ''
-        key_list = keyword.split(' ')
-        like_dict = {
-            '收藏影片': 'av_id',
-            '收藏导演': 'director_url',
-            '收藏制作': 'studio_url',
-            '收藏发行': 'label_url',
-            '收藏系列': 'series_url',
-            # '收藏明星': 'stars_url'
-        }
-        for key_item in key_list:
-            if key_item == '字幕':
-                where += ' av_163sub.sub_id IS NOT NULL and'
-                continue
-            if key_item == '已发布':
-                date = time.strftime("%Y-%m-%d", time.localtime())
-                where += ' av_list.release_date <= "{}" and'.format(date)
-                continue
-            if key_item in like_dict.keys():
-                sql = 'SELECT val FROM av_like WHERE type="{}"'.format(
-                    like_dict[key_item])
-                data = querySql(sql)
-                like_list = [x['val'] for x in data]
-                where += ' av_list.{} in ("{}") and'.format(
-                    like_dict[key_item],'","'.join(like_list))
-                continue
-            if key_item == '收藏明星':
-                sql = 'SELECT val FROM av_like WHERE type="stars"'
-                data = querySql(sql)
-                item_list = ['av_list.stars_url like "%{}%"'.format(x['val']) for x in data]
-                where += '({}) and'.format(' or '.join(item_list))
-                continue
-            where += '''
-            (av_list.title like "%{0}%" or
-            av_list.av_id like "%{0}%" or
-            av_list.director = "{0}" or
-            av_list.studio = "{0}" or
-            av_list.label like "%{0}%" or
-            av_list.series like "%{0}%" or
-            av_list.genre like "%{0}%" or
-            av_list.stars like "%{0}%")and'''.format(key_item)
-        where = where[:-3]
-    elif keyword == '':
-        where = '1'
-    result = sqliteSelect('*', 'av_list', where, (limit_start, PAGE_LIMIT))
-    if keyword != '':
-        page_root = '/{}/{}'.format('search', keyword)
-    else:
-        page_root = ''
-    return render_template('index.html', data=result[0], cdn=CDN_SITE, pageroot=page_root, page=pagination(pagenum, result[1]), keyword=keyword)
+#     #识别番号
+#     if re.match('^[a-zA-Z0-9 \-]{4,14}$', keyword):
+#         tmp = keyword.replace(' ', '-').upper()
+#         if '-' in tmp:
+#             return movie(tmp)
+#         else:
+#             where = 'av_list.av_id like "%{}%"'.format(tmp)
+#     #搜索
+#     elif keyword != '':
+#         where = ''
+#         key_list = keyword.split(' ')
+#         like_dict = {
+#             '收藏影片': 'av_id',
+#             '收藏导演': 'director_url',
+#             '收藏制作': 'studio_url',
+#             '收藏发行': 'label_url',
+#             '收藏系列': 'series_url',
+#             # '收藏明星': 'stars_url'
+#         }
+#         for key_item in key_list:
+#             if key_item == '字幕':
+#                 where += ' av_163sub.sub_id IS NOT NULL and'
+#                 continue
+#             if key_item == '已发布':
+#                 date = time.strftime("%Y-%m-%d", time.localtime())
+#                 where += ' av_list.release_date <= "{}" and'.format(date)
+#                 continue
+#             if key_item in like_dict.keys():
+#                 sql = 'SELECT val FROM av_like WHERE type="{}"'.format(
+#                     like_dict[key_item])
+#                 data = querySql(sql)
+#                 like_list = [x['val'] for x in data]
+#                 where += ' av_list.{} in ("{}") and'.format(
+#                     like_dict[key_item],'","'.join(like_list))
+#                 continue
+#             if key_item == '收藏明星':
+#                 sql = 'SELECT val FROM av_like WHERE type="stars"'
+#                 data = querySql(sql)
+#                 item_list = ['av_list.stars_url like "%{}%"'.format(x['val']) for x in data]
+#                 where += '({}) and'.format(' or '.join(item_list))
+#                 continue
+#             where += '''
+#             (av_list.title like "%{0}%" or
+#             av_list.av_id like "%{0}%" or
+#             av_list.director = "{0}" or
+#             av_list.studio = "{0}" or
+#             av_list.label like "%{0}%" or
+#             av_list.series like "%{0}%" or
+#             av_list.genre like "%{0}%" or
+#             av_list.stars like "%{0}%")and'''.format(key_item)
+#         where = where[:-3]
+#     elif keyword == '':
+#         where = '1'
+#     result = sqliteSelect('*', 'av_list', where, (limit_start, PAGE_LIMIT))
+#     if keyword != '':
+#         page_root = '/{}/{}'.format('search', keyword)
+#     else:
+#         page_root = ''
+#     return render_template('index.html', data=result[0], cdn=CDN_SITE, pageroot=page_root, page=pagination(pagenum, result[1]), keyword=keyword)
 
 @app.route('/movie/<linkid>')
 def movie(linkid=''):
