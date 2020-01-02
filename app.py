@@ -98,13 +98,11 @@ CDN_SITE = '//pics.dmm.co.jp'
 #缓存
 SQL_CACHE = {}
 IF_USE_CACHE = True
-DB = {}
 @app.route('/')
 @app.route('/page/<int:pagenum>')
 @app.route('/search/<keyword>')
 @app.route('/search/<keyword>/page/<int:pagenum>')
 def index(keyword = '', pagenum = 1):
-    DB = conn()
     if pagenum < 1:
         redirect(url_for('/'))
     limit_start = (pagenum -1) * PAGE_LIMIT
@@ -236,6 +234,7 @@ def sqliteSelect(column='*', table='av_list', where='1', limit=(0, 30), order='i
     return (result, res_count[0]['count'])
     
 def querySql(sql):
+    DB = conn()
     cacheKey = (binascii.crc32(sql.encode()) & 0xffffffff)
     #是否有缓存
     if cacheKey in SQL_CACHE.keys():
