@@ -29,8 +29,7 @@ def show():
         flash('无法查看已删除的 Todo')
         status = PLANNED
     try:
-        todos = Query('MovieList').add_descending('createdAt').find()
-        # todos = Query(Todo).add_descending('createdAt').equal_to('status', status).find()
+        todos = Query(Todo).add_descending('createdAt').equal_to('status', status).find()
     except LeanCloudError as e:
         todos = []
         flash(e.error)

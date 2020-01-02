@@ -38,7 +38,7 @@
 <div class="list-empty">
   <p class="text-center large-emoji">🎉</p>
   <p class="text-center lead">All Done!</p>
-  <p class="text-center"><a class="text-muted" href="{{ url_for('todos.show', status=1) }}">查看已完成的 todo</a> 或者 <a class="text-muted" href="#" onclick=document.getElementById('todo-content')>创建一个新的 todo</span></p>
+  <p class="text-center"><a class="text-muted" href="{{ url_for('todos.show', status=1) }}">查看已完成的 todo</a> 或者 <a class="text-muted" href="#" onclick=document.getElementById('todo-content').focus()>创建一个新的 todo</span></p>
 </div>
 {% elif status == 1 %}
 <div class="list-empty">
@@ -56,7 +56,7 @@
         <span class="glyphicon glyphicon-trash todo-delete"></span>
       </form>
       <form action="{{ url_for('todos.done', todo_id=todo.id, status=0) }}" method="post" id="done-{{todo.id}}">
-        <span class="glyphicon glyphicon-unchecked"></span> {{ todo.get('title') }}
+        <span class="glyphicon glyphicon-unchecked"></span> {{ todo.get('content') }}
       </form>
     </li>
   {% endfor %}

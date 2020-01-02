@@ -14,9 +14,8 @@ from flask import render_template
 from werkzeug import Request
 import leancloud
 
-# from views.todos import todos_view
-# from views.users import users_view
-# from views.movies import movies_view
+from views.todos import todos_view
+from views.users import users_view
 
 
 app = Flask(__name__)
@@ -58,7 +57,6 @@ app.wsgi_app = leancloud.engine.CookieSessionMiddleware(app.wsgi_app, app.secret
 # 动态路由
 app.register_blueprint(todos_view, url_prefix='/todos')
 app.register_blueprint(users_view, url_prefix='/users')
-app.register_blueprint(movies_view, url_prefix='/movies')
 
 
 @app.before_request
@@ -68,7 +66,7 @@ def before_request():
 
 @app.route('/')
 def index():
-    return redirect(url_for('movies.show'))
+    return redirect(url_for('todos.show'))
 
 
 @app.route('/help')
