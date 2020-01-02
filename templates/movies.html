@@ -1,0 +1,18 @@
+<div class="page-header">
+  <h1>电影列表</h1>
+</div>
+<div class="list-empty">
+  <p class="text-center large-emoji">🎉</p>
+  <p class="text-center lead">All Done!</p>
+  <p class="text-center"><a class="text-muted" href="#" onclick=document.getElementById('todo-content')>点击插入</span></p>
+</div>
+<ul class="list-group">
+  {% for todo in movies %}
+    <li class="list-group-item">
+      <form method="post" id="done-{{todo.id}}">
+        <span class="glyphicon glyphicon-unchecked"></span> {{ todo.get('title') }}
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+<p class="text-muted"><span class="glyphicon glyphicon-info-sign"></span> {% if movies|length == 1 %}只剩下最后{% else %}共{% endif %} {{ movies|length }} 个 todo。</p>
